@@ -1,9 +1,10 @@
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
+#include <limits>
 using namespace std;
 
-// ANSI color codes for text
+// ANSI color codes
 const string RED = "\033[31m";
 const string GREEN = "\033[32m";
 const string YELLOW = "\033[33m";
@@ -12,20 +13,15 @@ const string RESET = "\033[0m";
 
 // Get computer move randomly
 char getComputerMove() {
-    int move;
-    srand(time(NULL));
-    move = rand() % 3;
-    if (move == 0) return 'r'; // Rock
-    else if (move == 1) return 'p'; // Paper
-    return 's'; // Scissors
+    return "rps"[rand() % 3];
 }
 
 // Emoji for each move
 string emojiForMove(char move) {
     switch (move) {
-        case 'r': return "🪨"; // Rock emoji
-        case 'p': return "📄"; // Paper emoji
-        case 's': return "✂️"; // Scissors emoji
+        case 'r': return "🪨"; // Rock
+        case 'p': return "📄"; // Paper
+        case 's': return "✂️"; // Scissors
     }
     return "";
 }
@@ -41,30 +37,59 @@ int getResults(char playerMove, char computerMove) {
 }
 
 int main() {
-    char playerMove;
-    cout << BLUE << "Welcome to Rock Paper Scissors Game! " << RESET << endl;
-    cout << YELLOW << "Enter r for Rock, p for Paper, s for Scissors: " << RESET;
+    srand(time(NULL));
 
-    while (true) {
-        cin >> playerMove;
-        if (playerMove == 'r' || playerMove == 'p' || playerMove == 's')
-            break;
-        cout << RED << "Invalid input! Please enter r, p, or s: " << RESET;
+    int wins = 0, losses = 0, draws = 0;
+    char playAgain = 'c';
+
+    cout << BLUE << "Welcome to Rock Paper Scissors Game with Stats!" << RESET << endl;
+
+    while (playAgain == 'c') {
+        char playerMove;
+        cout << "\n" << YELLOW << "Enter r for Rock, p for Paper, s for Scissors: " << RESET;
+        while (true) {
+            cin >> playerMove;
+            if (playerMove == 'r' || playerMove == 'p' || playerMove == 's') break;
+            cout << RED << "Invalid input! Please enter r, p, or s: " << RESET;
+        }
+
+        char computerMove = getComputerMove();
+        int result = getResults(playerMove, computerMove);
+
+        cout << "Your Move: " << emojiForMove(playerMove) << endl;
+        cout << "Computer's Move: " << emojiForMove(computerMove) << endl;
+
+        if (result == 0) {
+            cout << YELLOW << "It's a Draw! 🤝" << RESET << endl;
+            draws++;
+        } else if (result == 1) {
+            cout << GREEN << "You won! 🎉" << RESET << endl;
+            wins++;
+        } else {
+            cout << RED << "Computer wins! 💻" << RESET << endl;
+            losses++;
+        }
+
+        int totalGames = wins + losses + draws;
+        double winPercent = 100.0 * wins / totalGames;
+        double lossPercent = 100.0 * losses / totalGames;
+        double drawPercent = 100.0 * draws / totalGames;
+
+        cout << "\n--- " << BLUE << "Game Stats" << RESET << " ---" << endl;
+        cout << "Total games played: " << totalGames << endl;
+        cout << "Wins: " << wins << " (" << winPercent << "%)" << endl;
+        cout << "Losses: " << losses << " (" << lossPercent << "%)" << endl;
+        cout << "Draws: " << draws << " (" << drawPercent << "%)" << endl;
+
+        cout << "\nType " << GREEN << "'c'" << RESET << " to continue playing, or " << RED << "'e'" << RESET << " to exit: ";
+        while (true) {
+            cin >> playAgain;
+            if (playAgain == 'c' || playAgain == 'e') break;
+            cout << RED << "Invalid input! Enter 'c' to continue or 'e' to exit: " << RESET;
+        }
     }
 
-    char computerMove = getComputerMove();
-    int result = getResults(playerMove, computerMove);
-
-    cout << "\nYour Move: " << emojiForMove(playerMove) << endl;
-    cout << "Computer's Move: " << emojiForMove(computerMove) << endl;
-
-    if (result == 0)
-        cout << YELLOW << "It's a Draw! 🤝" << RESET << endl;
-    else if (result == 1)
-        cout << GREEN << "Congratulations! You won! 🎉" << RESET << endl;
-    else
-        cout << RED << "Computer wins! Try again. 💻" << RESET << endl;
-
+    cout << BLUE << "Thanks for playing! Goodbye!" << RESET << endl;
     return 0;
 }
 
